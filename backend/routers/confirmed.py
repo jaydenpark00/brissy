@@ -13,7 +13,7 @@ class ConfirmedCreate(BaseModel):
     grade: str
 
 
-@router.post("/confirmed", status_code=201)
+@router.post("/confirmed", status_code=200)
 def create_confirmed(body: ConfirmedCreate):
     res = supabase.table("confirmed").insert({
         "user_id": body.user_id,

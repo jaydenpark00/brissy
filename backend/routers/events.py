@@ -12,7 +12,7 @@ class EventCreate(BaseModel):
     label: str
 
 
-@router.post("/events", status_code=201)
+@router.post("/events", status_code=200)
 def create_event(event: EventCreate):
     res = supabase.table("events").insert({
         "user_id": event.user_id,
