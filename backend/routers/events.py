@@ -25,7 +25,7 @@ def create_event(event: EventCreate):
 
 
 @router.get("/events")
-def get_events(month: str, userId: str):
+def get_events(month: str, userId: str = None):
     """month: YYYY-MM"""
     start = f"{month}-01"
     year, mon = map(int, month.split("-"))
@@ -33,16 +33,16 @@ def get_events(month: str, userId: str):
     last_day = calendar.monthrange(year, mon)[1]
     end = f"{month}-{last_day:02d}"
 
-    res = (
+    q = (
         supabase.table("events")
         .select("*")
-        .eq("user_id", userId)
         .gte("date", start)
         .lte("date", end)
         .order("date")
-        .execute()
     )
-    return res.data
+    if userId:
+        q = q.eq("user_id", userId)
+    return q.execute().data
 
 
 @router.delete("/events/{event_id}", status_code=204)

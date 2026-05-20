@@ -27,7 +27,7 @@ def create_confirmed(body: ConfirmedCreate):
 
 
 @router.get("/confirmed")
-def get_confirmed(month: str, userId: str):
+def get_confirmed(month: str, userId: str = None):
     """month: YYYY-MM"""
     import calendar
     start = f"{month}-01"
@@ -35,13 +35,13 @@ def get_confirmed(month: str, userId: str):
     last_day = calendar.monthrange(year, mon)[1]
     end = f"{month}-{last_day:02d}"
 
-    res = (
+    q = (
         supabase.table("confirmed")
         .select("*")
-        .eq("user_id", userId)
         .gte("date", start)
         .lte("date", end)
         .order("date")
-        .execute()
     )
-    return res.data
+    if userId:
+        q = q.eq("user_id", userId)
+    return q.execute().data

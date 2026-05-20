@@ -33,7 +33,7 @@ def _group_consecutive(dates: list[date]) -> list[list[date]]:
 
 
 @router.get("/free-windows")
-def get_free_windows(month: str, userId: str):
+def get_free_windows(month: str, userId: str = None):
     """month: YYYY-MM"""
     year, mon = map(int, month.split("-"))
     last_day = calendar.monthrange(year, mon)[1]
@@ -41,14 +41,15 @@ def get_free_windows(month: str, userId: str):
 
     start = str(all_days[0])
     end = str(all_days[-1])
-    res = (
+    q = (
         supabase.table("events")
         .select("date")
-        .eq("user_id", userId)
         .gte("date", start)
         .lte("date", end)
-        .execute()
     )
+    if userId:
+        q = q.eq("user_id", userId)
+    res = q.execute()
     busy = {row["date"] for row in (res.data or [])}
 
     free_days = sorted([d for d in all_days if str(d) not in busy])

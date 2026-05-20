@@ -16,7 +16,7 @@ import {
 
 const MOCK_MODE = import.meta.env.VITE_MOCK_MODE === "true";
 const API = import.meta.env.VITE_API_URL || "http://localhost:8000";
-const USER_ID = "demo-user";
+const USER_ID = "";
 
 export default function Home() {
   const [month, setMonth] = useState(dayjs().format("YYYY-MM"));
@@ -44,9 +44,9 @@ export default function Home() {
         setFreeWindows(fw.free_windows || []);
       } else {
         const [evRes, confRes, fwRes] = await Promise.all([
-          fetch(`${API}/events?month=${month}&userId=${USER_ID}`),
-          fetch(`${API}/confirmed?month=${month}&userId=${USER_ID}`),
-          fetch(`${API}/free-windows?month=${month}&userId=${USER_ID}`),
+          fetch(`${API}/events?month=${month}${USER_ID ? `&userId=${USER_ID}` : ""}`),
+          fetch(`${API}/confirmed?month=${month}${USER_ID ? `&userId=${USER_ID}` : ""}`),
+          fetch(`${API}/free-windows?month=${month}${USER_ID ? `&userId=${USER_ID}` : ""}`),
         ]);
         setEvents(await evRes.json());
         setConfirmed(await confRes.json());
