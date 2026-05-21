@@ -6,6 +6,7 @@ import Calendar from "../components/Calendar";
 import EventCard from "../components/EventCard";
 import ActivityCard from "../components/ActivityCard";
 import Toast from "../components/Toast";
+import DatePopover from "../components/DatePopover";
 import {
   apiFetchEvents, apiCreateEvent, apiDeleteEvent,
   apiFetchConfirmed, apiCreateConfirmed,
@@ -34,6 +35,8 @@ export default function Home() {
   const [saving, setSaving]       = useState(false);
   const [toast, setToast]         = useState(null);
   const [tab, setTab]             = useState("events");
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [popoverInfo, setPopoverInfo]   = useState(null);
 
   const notify = (msg, type="success") => setToast({ msg, type });
 
@@ -125,6 +128,18 @@ export default function Home() {
     } catch { notify("확정 실패","error"); }
   }
 
+  function handleDateClick(date, el) {
+    setDate(date);
+    setTab("events");
+    setSelectedDate(date);
+    setPopoverInfo({ date, rect: el.getBoundingClientRect() });
+  }
+
+  function closePopover() {
+    setPopoverInfo(null);
+    setSelectedDate(null);
+  }
+
   const ml        = dayjs(`${month}-01`).format("YYYY년 M월");
   const canSubmit = !saving && !!label.trim();
   const topGrade  = windows[0]?.grade;
@@ -202,8 +217,24 @@ export default function Home() {
           border:"1.5px solid var(--border)",
           boxShadow:"0 2px 16px rgba(124,111,247,.07)",
         }}>
-          <Calendar month={month} events={events} confirmed={confirmed} freeWindows={windows} />
+          <Calendar
+            month={month} events={events} confirmed={confirmed} freeWindows={windows}
+            onDateClick={handleDateClick} selectedDate={selectedDate}
+          />
         </div>
+
+        {/* 날짜 팝오버 */}
+        {popoverInfo && (
+          <DatePopover
+            info={popoverInfo}
+            events={events.filter(e => e.date === popoverInfo.date)}
+            confirmed={confirmed.find(c => c.date === popoverInfo.date)}
+            grade={windows.find(w => w.dates.includes(popoverInfo.date))?.grade}
+            onClose={closePopover}
+            onAddEvent={() => { setTab("events"); closePopover(); }}
+            onDelete={del}
+          />
+        )}
 
         {/* 사이드바 */}
         <div style={{

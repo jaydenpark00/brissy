@@ -13,7 +13,7 @@ const GRADE = {
 
 const WD = ["일","월","화","수","목","금","토"];
 
-export default function Calendar({ month, events, confirmed, freeWindows }) {
+export default function Calendar({ month, events, confirmed, freeWindows, onDateClick, selectedDate }) {
   const base  = dayjs(`${month}-01`);
   const today = dayjs().format("YYYY-MM-DD");
 
@@ -92,18 +92,33 @@ export default function Calendar({ month, events, confirmed, freeWindows }) {
                        : g           ? g.bg
                        : "var(--bg-2)";
 
+          const isSelected = date === selectedDate;
+
           return (
-            <div key={date} style={{
-              borderRight:"1px solid var(--border)",
-              borderBottom:"1px solid var(--border)",
-              background: cellBg,
-              padding:"9px 10px", overflow:"hidden",
-              transition:"background .15s",
-              position:"relative",
-            }}
-            onMouseEnter={e => e.currentTarget.style.background = "var(--bg-3)"}
-            onMouseLeave={e => e.currentTarget.style.background = cellBg}
+            <div key={date}
+              onClick={e => onDateClick?.(date, e.currentTarget)}
+              style={{
+                borderRight:"1px solid var(--border)",
+                borderBottom:"1px solid var(--border)",
+                background: cellBg,
+                padding:"9px 10px", overflow:"hidden",
+                transition:"background .15s",
+                position:"relative",
+                cursor: onDateClick ? "pointer" : "default",
+              }}
+              onMouseEnter={e => e.currentTarget.style.background = "var(--bg-3)"}
+              onMouseLeave={e => e.currentTarget.style.background = isSelected ? "var(--bg-3)" : cellBg}
             >
+              {/* 선택 링 */}
+              {isSelected && (
+                <div style={{
+                  position:"absolute", inset:0,
+                  border:"2px solid var(--accent)",
+                  borderRadius:3, pointerEvents:"none",
+                  zIndex:1,
+                }} />
+              )}
+
               {/* 등급 바 */}
               {g && !busy.length && !conf && (
                 <div style={{
