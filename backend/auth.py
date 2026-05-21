@@ -3,7 +3,7 @@ import httpx
 from backend.supabase_client import supabase
 
 
-def get_current_user(authorization: str = Header(None)) -> str | None:
+def get_current_user(authorization: str = Header(None)):
     """Returns user email from Bearer token (Supabase JWT or Google access token)."""
     if not authorization or not authorization.startswith("Bearer "):
         return None
