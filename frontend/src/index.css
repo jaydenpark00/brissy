@@ -1,15 +1,38 @@
 :root {
-  font-family: system-ui, 'Segoe UI', sans-serif;
+  --primary: #16a34a;
+  --primary-hover: #15803d;
+  --primary-light: #f0fdf4;
+  --primary-border: #bbf7d0;
+  --danger: #ef4444;
+  --danger-light: #fef2f2;
+  --bg: #f8fafc;
+  --card: #ffffff;
+  --border: #e2e8f0;
+  --text-1: #0f172a;
+  --text-2: #475569;
+  --text-3: #94a3b8;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+  --shadow-md: 0 4px 12px rgba(0,0,0,.08);
+  --radius: 12px;
+  --radius-sm: 8px;
+
+  font-family: 'Pretendard', 'Apple SD Gothic Neo', system-ui, -apple-system, sans-serif;
   font-size: 16px;
-  color: #111827;
-  background: #fff;
+  color: var(--text-1);
+  background: var(--bg);
   -webkit-font-smoothing: antialiased;
 }
 
-body {
-  margin: 0;
-}
+*, *::before, *::after { box-sizing: border-box; }
 
-#root {
-  min-height: 100vh;
-}
+body { margin: 0; }
+
+#root { min-height: 100vh; }
+
+button { font-family: inherit; cursor: pointer; }
+input, select { font-family: inherit; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
