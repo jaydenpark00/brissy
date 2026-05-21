@@ -309,16 +309,17 @@ export default function Home() {
               ["events",     "📅", `일정${events.length   ? ` (${events.length})`   : ""}`],
               ["windows",    "✨", `빈 날${windows.length  ? ` (${windows.length})`  : ""}`],
               ["activities", "🧭", "추천"],
+              ["summary",    "📊", "요약"],
             ].map(([k, icon, l]) => (
               <button key={k} onClick={()=>setTab(k)} style={{
-                flex:1, padding:"8px 4px",
+                flex:1, padding:"7px 2px",
                 background: tab===k ? "var(--accent)" : "transparent",
                 border: tab===k ? "none" : "1.5px solid var(--border)",
                 borderRadius:99,
-                fontSize:12, fontWeight: tab===k ? 700 : 500,
+                fontSize:11, fontWeight: tab===k ? 700 : 500,
                 color: tab===k ? "#fff" : "var(--text-2)",
                 transition:"all .2s",
-                display:"flex", alignItems:"center", justifyContent:"center", gap:4,
+                display:"flex", alignItems:"center", justifyContent:"center", gap:3,
               }}>{icon} {l}</button>
             ))}
           </div>
@@ -425,6 +426,11 @@ export default function Home() {
               </div>
             )}
 
+            {/* 요약 탭 */}
+            {tab==="summary" && (
+              <SummaryView events={events} confirmed={confirmed} windows={windows} month={month} />
+            )}
+
           </div>
         </div>
       </div>
@@ -470,6 +476,154 @@ function Empty({ icon, text, sub }) {
       <div style={{ fontSize:42, marginBottom:14 }}>{icon}</div>
       <div style={{ fontSize:14, fontWeight:700, color:"var(--text-2)", marginBottom:8 }}>{text}</div>
       {sub && <div style={{ fontSize:12, lineHeight:1.75, color:"var(--text-3)", whiteSpace:"pre-line" }}>{sub}</div>}
+    </div>
+  );
+}
+
+const GRADE_LABELS = { S:"S등급", A:"A등급", B:"B등급", C:"C등급", D:"D등급" };
+
+function SummaryView({ events, confirmed, windows, month }) {
+  const daysInMonth = dayjs(`${month}-01`).daysInMonth();
+  const busyDays    = new Set(events.map(e => e.date)).size;
+  const freeDays    = windows.reduce((s, w) => s + w.duration_days, 0);
+  const topWindow   = windows[0];
+
+  // 등급별 자유 일수 합산
+  const gradeDays = windows.reduce((acc, w) => {
+    acc[w.grade] = (acc[w.grade] || 0) + w.duration_days;
+    return acc;
+  }, {});
+
+  const busyPct = Math.round((busyDays / daysInMonth) * 100);
+  const freePct = Math.round((freeDays / daysInMonth) * 100);
+
+  return (
+    <div>
+      {/* 상단 스탯 카드 3개 */}
+      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:8, marginBottom:16 }}>
+        <StatCard value={busyDays}        label="일정 있는 날"  color="#D97706" bg="rgba(217,119,6,.08)"  border="rgba(217,119,6,.2)"  />
+        <StatCard value={`${freeDays}일`} label="자유 시간"     color="#047857" bg="rgba(4,120,87,.08)"   border="rgba(4,120,87,.2)"   />
+        <StatCard value={confirmed.length} label="확정 활동"   color="#2563EB" bg="rgba(37,99,235,.08)"  border="rgba(37,99,235,.2)"  />
+      </div>
+
+      {/* 이번 달 바쁨 / 자유 비율 바 */}
+      <div style={{
+        background:"var(--bg-2)", border:"1.5px solid var(--border)",
+        borderRadius:"var(--r)", padding:"14px 16px", marginBottom:12,
+      }}>
+        <div style={{ fontSize:11, fontWeight:700, color:"var(--text-3)", letterSpacing:".08em", textTransform:"uppercase", marginBottom:10 }}>
+          이번 달 {daysInMonth}일 개요
+        </div>
+        {/* 비율 바 */}
+        <div style={{ display:"flex", borderRadius:99, overflow:"hidden", height:10, marginBottom:10, background:"var(--bg-3)" }}>
+          {busyDays > 0 && (
+            <div style={{ width:`${busyPct}%`, background:"#FCD34D", transition:"width .4s ease" }} />
+          )}
+          {freeDays > 0 && (
+            <div style={{ width:`${freePct}%`, background:"#10B981", transition:"width .4s ease" }} />
+          )}
+        </div>
+        <div style={{ display:"flex", gap:14 }}>
+          <span style={{ display:"flex", alignItems:"center", gap:5, fontSize:11, color:"var(--text-2)" }}>
+            <span style={{ width:8, height:8, borderRadius:2, background:"#FCD34D", display:"inline-block" }}/>
+            바쁜 날 {busyDays}일
+          </span>
+          <span style={{ display:"flex", alignItems:"center", gap:5, fontSize:11, color:"var(--text-2)" }}>
+            <span style={{ width:8, height:8, borderRadius:2, background:"#10B981", display:"inline-block" }}/>
+            자유 시간 {freeDays}일
+          </span>
+          <span style={{ display:"flex", alignItems:"center", gap:5, fontSize:11, color:"var(--text-3)" }}>
+            <span style={{ width:8, height:8, borderRadius:2, background:"var(--bg-3)", border:"1px solid var(--border)", display:"inline-block" }}/>
+            기타 {daysInMonth - busyDays}일
+          </span>
+        </div>
+      </div>
+
+      {/* 등급별 자유 창 분포 */}
+      {windows.length > 0 && (
+        <div style={{
+          background:"var(--bg-2)", border:"1.5px solid var(--border)",
+          borderRadius:"var(--r)", padding:"14px 16px", marginBottom:12,
+        }}>
+          <div style={{ fontSize:11, fontWeight:700, color:"var(--text-3)", letterSpacing:".08em", textTransform:"uppercase", marginBottom:10 }}>
+            빈 날 등급 분포
+          </div>
+          <div style={{ display:"flex", flexDirection:"column", gap:7 }}>
+            {["S","A","B","C","D"].map(g => {
+              const days = gradeDays[g] || 0;
+              const maxDays = Math.max(...Object.values(gradeDays), 1);
+              return (
+                <div key={g} style={{ display:"flex", alignItems:"center", gap:8 }}>
+                  <span style={{
+                    width:22, height:22, borderRadius:7, flexShrink:0,
+                    background:`${GRADE_COLOR[g]}15`, border:`1px solid ${GRADE_COLOR[g]}30`,
+                    display:"flex", alignItems:"center", justifyContent:"center",
+                    fontSize:10, fontWeight:800, color:GRADE_COLOR[g],
+                  }}>{g}</span>
+                  <div style={{ flex:1, background:"var(--bg-3)", borderRadius:99, height:6, overflow:"hidden" }}>
+                    <div style={{
+                      width: days > 0 ? `${(days/maxDays)*100}%` : "0%",
+                      height:"100%", background:GRADE_COLOR[g],
+                      borderRadius:99, transition:"width .4s ease",
+                    }} />
+                  </div>
+                  <span style={{ fontSize:11, fontWeight:600, color: days > 0 ? GRADE_COLOR[g] : "var(--text-3)", minWidth:28, textAlign:"right" }}>
+                    {days > 0 ? `${days}일` : "—"}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* 최우선 창 */}
+      {topWindow && (
+        <div style={{
+          background:`${GRADE_COLOR[topWindow.grade]}08`,
+          border:`1.5px solid ${GRADE_COLOR[topWindow.grade]}30`,
+          borderRadius:"var(--r)", padding:"14px 16px",
+          position:"relative", overflow:"hidden",
+        }}>
+          <div style={{
+            position:"absolute", top:0, left:0, right:0, height:3,
+            background:`linear-gradient(90deg, ${GRADE_COLOR[topWindow.grade]}, ${GRADE_COLOR[topWindow.grade]}50)`,
+          }} />
+          <div style={{ fontSize:11, fontWeight:700, color:GRADE_COLOR[topWindow.grade], letterSpacing:".06em", textTransform:"uppercase", marginBottom:8 }}>
+            ✨ 최우선 자유 창
+          </div>
+          <div style={{ fontSize:15, fontWeight:800, color:"var(--text-1)", marginBottom:4 }}>
+            {topWindow.dates[0]}{topWindow.dates.length > 1 ? ` ~ ${topWindow.dates[topWindow.dates.length-1]}` : ""}
+          </div>
+          <div style={{ display:"flex", gap:8, fontSize:11, color:"var(--text-2)" }}>
+            <span>📆 {topWindow.duration_days}일</span>
+            {topWindow.has_weekend && <span style={{ color:"#3B82F6" }}>🏖 주말 포함</span>}
+            <span style={{
+              background:`${GRADE_COLOR[topWindow.grade]}15`,
+              border:`1px solid ${GRADE_COLOR[topWindow.grade]}30`,
+              borderRadius:6, padding:"1px 7px",
+              fontWeight:700, color:GRADE_COLOR[topWindow.grade],
+            }}>{topWindow.grade}등급</span>
+          </div>
+        </div>
+      )}
+
+      {/* 데이터 없는 경우 */}
+      {events.length === 0 && windows.length === 0 && confirmed.length === 0 && (
+        <Empty icon="📊" text="아직 데이터가 없어요" sub="일정을 추가하면\n이번 달 요약이 여기 나타납니다" />
+      )}
+    </div>
+  );
+}
+
+function StatCard({ value, label, color, bg, border }) {
+  return (
+    <div style={{
+      background: bg, border:`1.5px solid ${border}`,
+      borderRadius:16, padding:"14px 10px", textAlign:"center",
+    }}>
+      <div style={{ fontSize:22, fontWeight:800, color, lineHeight:1 }}>{value}</div>
+      <div style={{ fontSize:10, color:"var(--text-3)", marginTop:5, fontWeight:600, lineHeight:1.3 }}>{label}</div>
     </div>
   );
 }
