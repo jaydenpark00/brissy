@@ -21,6 +21,6 @@ create table if not exists confirmed (
 
 create index if not exists idx_confirmed_user_date on confirmed (user_id, date);
 
--- Realtime 활성화 (Supabase 대시보드 또는 아래 명령으로)
+-- Realtime 활성화
 alter publication supabase_realtime add table events;
 alter publication supabase_realtime add table confirmed;

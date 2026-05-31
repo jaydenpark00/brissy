@@ -22,3 +22,8 @@ frontend/dist/
 .idea/
 .vscode/
 *.swp
+
+# Supabase CLI
+supabase/.branches
+supabase/.temp
+.supabase
