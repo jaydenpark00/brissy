@@ -90,7 +90,7 @@ export default function Calendar({ month, events, confirmed, freeWindows, onDate
                 cursor: onDateClick ? "pointer" : "default",
               }}
               onMouseEnter={e => e.currentTarget.style.background = "var(--bg-3)"}
-              onMouseLeave={e => e.currentTarget.style.background = isSelected ? "var(--bg-3)" : cellBg}
+              onMouseLeave={e => e.currentTarget.style.background = cellBg}
             >
               {/* 선택 링 */}
               {isSelected && (
