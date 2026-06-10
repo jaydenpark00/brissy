@@ -216,10 +216,22 @@ const MOCK_ACTIVITIES = [
   },
 ];
 
-export async function apiFetchActivities({ grade, region, season }) {
+const TRIP_TYPE_TAGS = {
+  자연: ["자연", "등산", "운동", "계곡", "드라이브", "스포츠"],
+  문화: ["문화", "역사", "도시", "사진"],
+  미식: ["미식", "카페"],
+  휴양: ["휴식", "바다", "야경", "가족", "커플", "혼자"],
+};
+
+export async function apiFetchActivities({ grade, region, season, max_days, trip_type }) {
   let items = [...MOCK_ACTIVITIES];
-  if (grade) items = items.filter((a) => a.grade.includes(grade));
-  if (region) items = items.filter((a) => a.region === region);
-  if (season) items = items.filter((a) => a.season.includes(season));
+  if (grade)     items = items.filter((a) => a.grade.includes(grade));
+  if (region)    items = items.filter((a) => a.region === region);
+  if (season)    items = items.filter((a) => a.season.includes(season));
+  if (max_days)  items = items.filter((a) => a.duration_days <= max_days);
+  if (trip_type && TRIP_TYPE_TAGS[trip_type]) {
+    const target = TRIP_TYPE_TAGS[trip_type];
+    items = items.filter((a) => a.tags.some((t) => target.includes(t)));
+  }
   return { activities: items, total: items.length };
 }

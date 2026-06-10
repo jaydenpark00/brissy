@@ -31,6 +31,7 @@ export default function Home() {
   const [date, setDate]           = useState(dayjs().format("YYYY-MM-DD"));
   const [region, setRegion]       = useState("서울");
   const [season, setSeason]       = useState("spring");
+  const [tripType, setTripType]   = useState(null);
   const [loading, setLoading]     = useState(false);
   const [saving, setSaving]       = useState(false);
   const [toast, setToast]         = useState(null);
@@ -96,18 +97,30 @@ export default function Home() {
     } catch { notify("삭제 실패","error"); }
   }
 
-  async function recommend() {
-    const grade = windows[0]?.grade;
+  async function recommend(overrideWindow = null) {
+    const w        = overrideWindow || windows[0];
+    const grade    = w?.grade;
+    const max_days = w?.duration_days;
     try {
       if (MOCK) {
-        const d = await apiFetchActivities({ grade, region, season });
+        const d = await apiFetchActivities({ grade, region, season, max_days, trip_type: tripType });
         setActs(d.activities||[]);
       } else {
         const p = new URLSearchParams({ region, season });
-        if (grade) p.append("grade", grade);
+        if (grade)    p.append("grade", grade);
+        if (max_days) p.append("max_days", max_days);
+        if (tripType) p.append("trip_type", tripType);
         setActs(((await (await fetch(`${API}/activities?${p}`)).json()).activities)||[]);
       }
     } catch { notify("추천 실패","error"); }
+  }
+
+  const recommendRef = useRef(null);
+
+  function findTripForWindow(w) {
+    // 빈 날 창 카드의 "여행 찾기" 버튼 클릭 시
+    recommend(w);
+    setTimeout(() => recommendRef.current?.scrollIntoView({ behavior:"smooth", block:"start" }), 100);
   }
 
   async function confirm(act) {
@@ -140,6 +153,11 @@ export default function Home() {
   const topGrade  = windows[0]?.grade;
   const busyDays  = new Set(events.map(e => e.date)).size;
   const freeDays  = windows.reduce((s, w) => s + w.duration_days, 0);
+
+  // D-day: 오늘 이후 가장 가까운 확정 여행
+  const today    = dayjs().format("YYYY-MM-DD");
+  const nextTrip = confirmed.filter(c => c.date >= today).sort((a,b) => a.date.localeCompare(b.date))[0];
+  const dday     = nextTrip ? dayjs(nextTrip.date).diff(dayjs(), "day") : null;
 
   return (
     <div style={{ display:"flex", flexDirection:"column", height:"100%", background:"var(--bg)" }}>
@@ -175,6 +193,11 @@ export default function Home() {
         {loading && <span style={{ fontSize:11, color:"var(--text-3)", fontStyle:"italic" }}>불러오는 중…</span>}
 
         <div style={{ marginLeft:"auto", display:"flex", gap:6 }}>
+          {dday !== null && (
+            <HeaderChip color="#7C6FF7" bg="rgba(124,111,247,.1)" border="rgba(124,111,247,.25)">
+              🗺️ {dday === 0 ? "오늘 여행!" : `D-${dday}`}
+            </HeaderChip>
+          )}
           {topGrade && (
             <HeaderChip color={GRADE_COLOR[topGrade]} bg={`${GRADE_COLOR[topGrade]}12`} border={`${GRADE_COLOR[topGrade]}30`}>
               ✨ 최우선 {topGrade}등급
@@ -340,6 +363,18 @@ export default function Home() {
                         {w.has_weekend && <span style={{ color:"#3B82F6" }}>🏖 주말 포함</span>}
                       </div>
                     </div>
+                    <button
+                      onClick={() => findTripForWindow(w)}
+                      style={{
+                        flexShrink:0, padding:"6px 10px",
+                        background:"var(--accent-bg)", color:"var(--accent)",
+                        border:"1.5px solid var(--accent)", borderRadius:"var(--rs)",
+                        fontSize:11, fontWeight:700, cursor:"pointer",
+                        transition:"all .15s", whiteSpace:"nowrap",
+                      }}
+                      onMouseEnter={e=>{ e.currentTarget.style.background="var(--accent)"; e.currentTarget.style.color="#fff"; }}
+                      onMouseLeave={e=>{ e.currentTarget.style.background="var(--accent-bg)"; e.currentTarget.style.color="var(--accent)"; }}
+                    >여행 찾기 →</button>
                   </div>
                 ))
               }
@@ -348,8 +383,29 @@ export default function Home() {
             <Divider />
 
             {/* ── 추천 활동 ── */}
-            <div style={{ padding:"0 16px 24px", background:"var(--bg-2)" }}>
+            <div ref={recommendRef} style={{ padding:"0 16px 24px", background:"var(--bg-2)" }}>
               <SectionHeader icon="🧭" title="추천 활동" />
+
+              {/* 여행 타입 필터 */}
+              <div style={{ display:"flex", gap:6, marginBottom:12, flexWrap:"wrap" }}>
+                {[
+                  [null,   "전체"],
+                  ["자연", "🌿 자연"],
+                  ["문화", "🏛️ 문화"],
+                  ["미식", "🍽️ 미식"],
+                  ["휴양", "🏖️ 휴양"],
+                ].map(([val, label]) => (
+                  <button key={String(val)} onClick={() => setTripType(val)} style={{
+                    padding:"5px 12px",
+                    background: tripType === val ? "var(--accent)" : "var(--bg-3)",
+                    color: tripType === val ? "#fff" : "var(--text-2)",
+                    border: tripType === val ? "none" : "1.5px solid var(--border)",
+                    borderRadius:99, fontSize:11, fontWeight:600,
+                    cursor:"pointer", transition:"all .15s",
+                  }}>{label}</button>
+                ))}
+              </div>
+
               <div style={{ display:"flex", gap:8, marginBottom:10 }}>
                 <div style={{ flex:1 }}>
                   <label style={labelSt}>📍 지역</label>
