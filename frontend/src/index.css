@@ -1,44 +1,98 @@
 :root {
-  --bg:        #F7F5FF;   /* 라이트 라벤더 */
-  --bg-2:      #FFFFFF;   /* 화이트 */
-  --bg-3:      #EDE9FF;   /* 연보라 (hover/input) */
-  --border:    #E4DEFF;
-  --border-2:  #C8BFFF;
+  --bg: #f8f9fa;
+  /* Google Calendar light grey background */
+  --bg-2: #ffffff;
+  /* White background */
+  --bg-3: #f1f3f4;
+  /* Hover, active state, input fields */
+  --border: #dadce0;
+  /* Standard Google Calendar grid border */
+  --border-2: #bdc1c6;
+  /* Muted dark border */
 
-  --accent:    #7C6FF7;   /* 소프트 바이올렛 */
-  --accent-2:  #9D96FA;
-  --accent-bg: rgba(124,111,247,.1);
+  --accent: #1a73e8;
+  /* Google Calendar Blue */
+  --accent-2: #1557b0;
+  /* Darker Blue */
+  --accent-bg: rgba(26, 115, 232, 0.08);
 
-  --text-1:    #1E1A40;   /* 딥 네이비-퍼플 */
-  --text-2:    #6B67A0;   /* 뮤트 퍼플-그레이 */
-  --text-3:    #B8B4D8;   /* 매우 연한 */
+  --text-1: #3c4043;
+  /* Main text */
+  --text-2: #5f6368;
+  /* Secondary text */
+  --text-3: #70757a;
+  /* Muted text */
 
-  --grade-s:   #047857;
-  --grade-a:   #059669;
-  --grade-b:   #10B981;
-  --grade-c:   #34D399;
-  --grade-d:   #6EE7B7;
+  --grade-s: #137333;
+  /* Google Green (Dark) */
+  --grade-a: #188038;
+  --grade-b: #1e8e3e;
+  --grade-c: #34a853;
+  --grade-d: #81c784;
 
-  --shadow:    0 4px 24px rgba(124,111,247,.1);
-  --shadow-sm: 0 2px 8px rgba(0,0,0,.06);
+  --shadow: 0 1px 3px 0 rgba(60, 64, 67, 0.3), 0 4px 8px 3px rgba(60, 64, 67, 0.15);
+  --shadow-sm: 0 1px 2px 0 rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);
 
-  --r:  20px;
-  --rs: 12px;
+  --r: 8px;
+  /* Shaper rounded corners */
+  --rs: 4px;
   --header: 64px;
 
-  font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+  font-family: 'Google Sans', Roboto, -apple-system, BlinkMacSystemFont, Arial, sans-serif;
   font-size: 14px;
   color: var(--text-1);
   background: var(--bg);
   -webkit-font-smoothing: antialiased;
 }
 
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html, body, #root { height: 100%; overflow: hidden; }
-button { font-family: inherit; cursor: pointer; }
-input, select { font-family: inherit; background: transparent; color: inherit; }
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
-::selection { background: var(--accent-bg); }
-::-webkit-scrollbar { width: 5px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 99px; }
+html,
+body,
+#root {
+  height: 100%;
+  overflow: hidden;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+input,
+select {
+  font-family: inherit;
+  background: transparent;
+  color: inherit;
+}
+
+::selection {
+  background: var(--accent-bg);
+}
+
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-2);
+  border-radius: 99px;
+}
+
+.calendar-cell {
+  transition: background .15s;
+}
+
+.calendar-cell:hover {
+  background: var(--bg-3) !important;
+}

@@ -11,28 +11,26 @@ export default function EventCard({ event, onDelete }) {
   return (
     <div style={{
       display:"flex", alignItems:"center", gap:12,
-      padding:"11px 12px",
-      background:"var(--bg-2)",
-      border:"1.5px solid var(--border)",
+      padding:"10px 12px",
+      background:"#ffffff",
+      border:"1px solid var(--border)",
       borderRadius:"var(--r)",
       marginBottom:8,
-      transition:"border-color .15s, box-shadow .15s",
-      boxShadow:"0 1px 4px rgba(0,0,0,.04)",
+      transition:"border-color .15s",
     }}
-    onMouseEnter={e => { e.currentTarget.style.borderColor="var(--accent)"; e.currentTarget.style.boxShadow="0 2px 12px rgba(124,111,247,.12)"; }}
-    onMouseLeave={e => { e.currentTarget.style.borderColor="var(--border)"; e.currentTarget.style.boxShadow="0 1px 4px rgba(0,0,0,.04)"; }}
+    onMouseEnter={e => { e.currentTarget.style.borderColor="var(--border-2)"; }}
+    onMouseLeave={e => { e.currentTarget.style.borderColor="var(--border)"; }}
     >
       {/* 날짜 배지 */}
       <div style={{
-        width:42, height:42, borderRadius:14, flexShrink:0,
-        background:"var(--accent-bg)",
-        border:"1.5px solid var(--border-2)",
+        width:40, height:40, borderRadius:"var(--rs)", flexShrink:0,
+        background:"var(--bg-3)",
         display:"flex", flexDirection:"column",
         alignItems:"center", justifyContent:"center",
       }}>
-        <div style={{ fontSize:16, fontWeight:800, lineHeight:1, color:"var(--accent)" }}>{d.date()}</div>
-        <div style={{ fontSize:10, fontWeight:600, marginTop:2,
-          color: isWeekend ? "#EF4444" : "var(--text-3)" }}>
+        <div style={{ fontSize:15, fontWeight:600, lineHeight:1, color:"var(--text-1)" }}>{d.date()}</div>
+        <div style={{ fontSize:9, fontWeight:500, marginTop:2,
+          color: isWeekend ? "#d93025" : "var(--text-2)" }}>
           {DOW[d.day()]}
         </div>
       </div>
@@ -40,7 +38,7 @@ export default function EventCard({ event, onDelete }) {
       {/* 내용 */}
       <div style={{ flex:1, minWidth:0 }}>
         <div style={{
-          fontSize:14, fontWeight:500, color:"var(--text-1)",
+          fontSize:13, fontWeight:500, color:"var(--text-1)",
           overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap",
         }}>
           {event.label}
@@ -52,14 +50,15 @@ export default function EventCard({ event, onDelete }) {
       <button
         onClick={() => { if(window.confirm(`"${event.label}" 삭제할까요?`)) onDelete(event.id); }}
         style={{
-          width:28, height:28, borderRadius:8, flexShrink:0,
-          background:"none", border:"1.5px solid transparent",
+          width:24, height:24, borderRadius:"50%", flexShrink:0,
+          background:"none", border:"none",
           color:"var(--text-3)", fontSize:12,
           display:"flex", alignItems:"center", justifyContent:"center",
           transition:"all .15s",
+          cursor:"pointer",
         }}
-        onMouseEnter={e => { e.currentTarget.style.background="rgba(239,68,68,.1)"; e.currentTarget.style.borderColor="rgba(239,68,68,.25)"; e.currentTarget.style.color="#EF4444"; }}
-        onMouseLeave={e => { e.currentTarget.style.background="none"; e.currentTarget.style.borderColor="transparent"; e.currentTarget.style.color="var(--text-3)"; }}
+        onMouseEnter={e => { e.currentTarget.style.background="rgba(217,119,6,0.1)"; e.currentTarget.style.color="#d93025"; }}
+        onMouseLeave={e => { e.currentTarget.style.background="none"; e.currentTarget.style.color="var(--text-3)"; }}
       >✕</button>
     </div>
   );

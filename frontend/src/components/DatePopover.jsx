@@ -3,7 +3,7 @@ import "dayjs/locale/ko";
 dayjs.locale("ko");
 
 const DOW   = ["일","월","화","수","목","금","토"];
-const GRADE_COLOR = { S:"#047857", A:"#059669", B:"#10B981", C:"#34D399", D:"#6EE7B7" };
+const GRADE_COLOR = { S:"#137333", A:"#188038", B:"#1e8e3e", C:"#34a853", D:"#81c784" };
 const GRADE_LABEL = { S:"최우선 자유일", A:"A등급 자유일", B:"B등급 자유일", C:"C등급 자유일", D:"D등급 자유일" };
 
 export default function DatePopover({ info, events, confirmed, grade, onClose, onAddEvent, onDelete }) {
@@ -30,10 +30,10 @@ export default function DatePopover({ info, events, confirmed, grade, onClose, o
       <div style={{
         position:"fixed", left, top,
         width:PW, zIndex:1000,
-        background:"var(--bg-2)",
-        border:"1.5px solid var(--border)",
+        background:"#ffffff",
+        border:"1px solid var(--border)",
         borderRadius:"var(--r)",
-        boxShadow:"0 8px 32px rgba(0,0,0,.12), 0 2px 8px rgba(124,111,247,.1)",
+        boxShadow:"var(--shadow)",
         overflow:"hidden",
         animation:"popIn .18s ease",
       }}>
@@ -46,35 +46,36 @@ export default function DatePopover({ info, events, confirmed, grade, onClose, o
           display:"flex", justifyContent:"space-between", alignItems:"flex-start",
         }}>
           <div>
-            <div style={{ fontSize:16, fontWeight:800, color:"var(--text-1)", lineHeight:1.2 }}>
+            <div style={{ fontSize:16, fontWeight:600, color:"var(--text-1)", lineHeight:1.2 }}>
               {d.format("M월 D일")}
               <span style={{
-                marginLeft:6, fontSize:12, fontWeight:600,
-                color: dow===0 ? "#EF4444" : dow===6 ? "#3B82F6" : "var(--text-3)",
+                marginLeft:6, fontSize:12, fontWeight:500,
+                color: dow===0 ? "#d93025" : dow===6 ? "#1a73e8" : "var(--text-2)",
               }}>{DOW[dow]}요일</span>
             </div>
             {grade && (
               <div style={{
                 marginTop:5, display:"inline-flex", alignItems:"center", gap:5,
-                background:`${GRADE_COLOR[grade]}12`,
-                border:`1px solid ${GRADE_COLOR[grade]}30`,
-                borderRadius:99, padding:"3px 9px",
-                fontSize:11, fontWeight:700, color:GRADE_COLOR[grade],
+                background:"#e6f4ea",
+                border:"1px solid rgba(24,128,56,0.2)",
+                borderRadius:4, padding:"3px 8px",
+                fontSize:11, fontWeight:600, color:GRADE_COLOR[grade],
               }}>
                 ✨ {GRADE_LABEL[grade]}
               </div>
             )}
           </div>
           <button onClick={onClose} style={{
-            width:26, height:26, borderRadius:8, flexShrink:0,
-            background:"none", border:"1.5px solid transparent",
-            color:"var(--text-3)", fontSize:14,
+            width:28, height:28, borderRadius:"50%", flexShrink:0,
+            background:"none", border:"none",
+            color:"var(--text-2)", fontSize:16,
             display:"flex", alignItems:"center", justifyContent:"center",
-            transition:"all .15s",
+            transition:"background .15s",
+            cursor:"pointer",
           }}
-          onMouseEnter={e=>{ e.currentTarget.style.background="var(--bg-3)"; e.currentTarget.style.borderColor="var(--border)"; }}
-          onMouseLeave={e=>{ e.currentTarget.style.background="none"; e.currentTarget.style.borderColor="transparent"; }}
-          >×</button>
+          onMouseEnter={e=>{ e.currentTarget.style.background="var(--bg-3)"; }}
+          onMouseLeave={e=>{ e.currentTarget.style.background="none"; }}
+          >✕</button>
         </div>
 
         {/* 일정 목록 */}
@@ -88,25 +89,27 @@ export default function DatePopover({ info, events, confirmed, grade, onClose, o
               {events.map(ev => (
                 <div key={ev.id} style={{
                   display:"flex", alignItems:"center", gap:8,
-                  padding:"7px 10px", marginBottom:5,
-                  background:"var(--bg-3)",
-                  border:"1px solid var(--border)",
-                  borderRadius:12,
+                  padding:"6px 10px", marginBottom:6,
+                  background:"#fef7e0",
+                  border:"1px solid rgba(249,171,0,0.2)",
+                  borderLeft:"4px solid #f9ab00",
+                  borderRadius:4,
                 }}>
-                  <span style={{ fontSize:13, color:"var(--text-1)", flex:1, lineHeight:1.3 }}>
+                  <span style={{ fontSize:13, color:"#b06000", flex:1, fontWeight:500, lineHeight:1.3 }}>
                     {ev.label}
                   </span>
                   <button
                     onClick={() => { if(window.confirm(`"${ev.label}" 삭제할까요?`)) { onDelete(ev.id); } }}
                     style={{
-                      width:22, height:22, borderRadius:6, flexShrink:0,
+                      width:20, height:20, borderRadius:"50%", flexShrink:0,
                       background:"none", border:"none",
-                      color:"var(--text-3)", fontSize:11,
+                      color:"#b06000", fontSize:10,
                       display:"flex", alignItems:"center", justifyContent:"center",
-                      transition:"all .15s",
+                      transition:"background .15s",
+                      cursor:"pointer",
                     }}
-                    onMouseEnter={e=>{ e.currentTarget.style.background="rgba(239,68,68,.1)"; e.currentTarget.style.color="#EF4444"; }}
-                    onMouseLeave={e=>{ e.currentTarget.style.background="none"; e.currentTarget.style.color="var(--text-3)"; }}
+                    onMouseEnter={e=>{ e.currentTarget.style.background="rgba(217,119,6,.15)"; }}
+                    onMouseLeave={e=>{ e.currentTarget.style.background="none"; }}
                   >✕</button>
                 </div>
               ))}
@@ -114,19 +117,20 @@ export default function DatePopover({ info, events, confirmed, grade, onClose, o
               {confirmed && (
                 <div style={{
                   display:"flex", alignItems:"center", gap:8,
-                  padding:"7px 10px",
-                  background:"rgba(37,99,235,.05)",
-                  border:"1px solid rgba(37,99,235,.2)",
-                  borderRadius:12,
+                  padding:"6px 10px",
+                  background:"#e8f0fe",
+                  border:"1px solid rgba(26,115,232,0.2)",
+                  borderLeft:"4px solid #1a73e8",
+                  borderRadius:4,
                 }}>
-                  <span style={{ fontSize:11, color:"#2563EB", fontWeight:700 }}>✓</span>
-                  <span style={{ fontSize:13, color:"#2563EB", flex:1, fontWeight:500 }}>
+                  <span style={{ fontSize:11, color:"#1a73e8", fontWeight:700 }}>✓</span>
+                  <span style={{ fontSize:13, color:"#1a73e8", flex:1, fontWeight:500 }}>
                     {confirmed.activity}
                   </span>
                   <span style={{
                     fontSize:10, fontWeight:700,
-                    background:"rgba(37,99,235,.1)", color:"#2563EB",
-                    borderRadius:6, padding:"2px 6px",
+                    background:"rgba(26,115,232,.12)", color:"#1a73e8",
+                    borderRadius:4, padding:"2px 6px",
                   }}>확정</span>
                 </div>
               )}
@@ -140,12 +144,12 @@ export default function DatePopover({ info, events, confirmed, grade, onClose, o
             width:"100%", padding:"9px",
             background:"var(--accent)", color:"#fff",
             border:"none", borderRadius:"var(--rs)",
-            fontSize:13, fontWeight:700,
-            boxShadow:"0 2px 8px rgba(124,111,247,.3)",
-            transition:"opacity .15s, transform .1s",
+            fontSize:13, fontWeight:500,
+            cursor:"pointer",
+            transition:"background .15s",
           }}
-          onMouseEnter={e=>{ e.currentTarget.style.opacity=".88"; e.currentTarget.style.transform="translateY(-1px)"; }}
-          onMouseLeave={e=>{ e.currentTarget.style.opacity="1"; e.currentTarget.style.transform="translateY(0)"; }}
+          onMouseEnter={e=>{ e.currentTarget.style.background="var(--accent-2)"; }}
+          onMouseLeave={e=>{ e.currentTarget.style.background="var(--accent)"; }}
           >➕ 이 날 일정 추가</button>
         </div>
       </div>
