@@ -3,14 +3,6 @@ import dayjs from "dayjs";
 import "dayjs/locale/ko";
 dayjs.locale("ko");
 
-const GRADE = {
-  S: { color:"#047857", bg:"rgba(4,120,87,.09)",    text:"#047857" },
-  A: { color:"#059669", bg:"rgba(5,150,105,.08)",   text:"#059669" },
-  B: { color:"#10B981", bg:"rgba(16,185,129,.07)",  text:"#10B981" },
-  C: { color:"#34D399", bg:"rgba(52,211,153,.08)",  text:"#059669" },
-  D: { color:"#6EE7B7", bg:"rgba(110,231,183,.08)", text:"#10B981" },
-};
-
 const WD = ["일","월","화","수","목","금","토"];
 
 export default function Calendar({ month, events, confirmed, freeWindows, onDateClick, selectedDate }) {
@@ -28,12 +20,6 @@ export default function Calendar({ month, events, confirmed, freeWindows, onDate
     for (const c of confirmed) m[c.date] = c.activity;
     return m;
   }, [confirmed]);
-
-  const gMap = useMemo(() => {
-    const m = {};
-    for (const w of freeWindows) for (const d of w.dates) m[d] = w.grade;
-    return m;
-  }, [freeWindows]);
 
   const { cells, rows } = useMemo(() => {
     const blanks = Array(base.day()).fill(null);
@@ -81,15 +67,12 @@ export default function Calendar({ month, events, confirmed, freeWindows, onDate
 
           const busy    = eMap[date] || [];
           const conf    = cMap[date];
-          const grade   = gMap[date];
           const dow     = dayjs(date).day();
           const dn      = parseInt(date.slice(-2), 10);
           const isToday = date === today;
-          const g       = grade ? GRADE[grade] : null;
 
           const cellBg = conf        ? "rgba(37,99,235,.05)"
                        : busy.length ? "rgba(245,158,11,.06)"
-                       : g           ? g.bg
                        : "var(--bg-2)";
 
           const isSelected = date === selectedDate;
@@ -119,14 +102,6 @@ export default function Calendar({ month, events, confirmed, freeWindows, onDate
                 }} />
               )}
 
-              {/* 등급 바 */}
-              {g && !busy.length && !conf && (
-                <div style={{
-                  position:"absolute", left:0, top:0, bottom:0, width:3,
-                  background:g.color, borderRadius:"0 2px 2px 0",
-                }} />
-              )}
-
               {/* 날짜 숫자 */}
               <div style={{ display:"flex", alignItems:"center", gap:4, marginBottom:4 }}>
                 <span style={{
@@ -139,9 +114,6 @@ export default function Calendar({ month, events, confirmed, freeWindows, onDate
                        : dow===6   ? "#3B82F6"
                        : "var(--text-1)",
                 }}>{dn}</span>
-                {g && !busy.length && !conf && (
-                  <span style={{ fontSize:10, fontWeight:700, color:g.text }}>{grade}</span>
-                )}
               </div>
 
               {/* 일정 */}
@@ -175,12 +147,6 @@ export default function Calendar({ month, events, confirmed, freeWindows, onDate
         flexShrink:0, flexWrap:"wrap",
         background:"var(--bg-2)",
       }}>
-        {Object.entries(GRADE).map(([g, {color}]) => (
-          <span key={g} style={{ display:"flex", alignItems:"center", gap:5, fontSize:11, color:"var(--text-3)" }}>
-            <span style={{ width:10, height:3, background:color, display:"inline-block", borderRadius:99 }}/>
-            {g}등급
-          </span>
-        ))}
         <span style={{ display:"flex", alignItems:"center", gap:5, fontSize:11, color:"var(--text-3)" }}>
           <span style={{ width:10, height:3, background:"#D97706", display:"inline-block", borderRadius:99 }}/>
           일정
