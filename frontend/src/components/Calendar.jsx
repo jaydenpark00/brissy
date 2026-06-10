@@ -4,11 +4,11 @@ import "dayjs/locale/ko";
 dayjs.locale("ko");
 
 const GRADE = {
-  S: { color:"#047857", bg:"rgba(4,120,87,.09)",    text:"#047857" },
-  A: { color:"#059669", bg:"rgba(5,150,105,.08)",   text:"#059669" },
-  B: { color:"#10B981", bg:"rgba(16,185,129,.07)",  text:"#10B981" },
-  C: { color:"#34D399", bg:"rgba(52,211,153,.08)",  text:"#059669" },
-  D: { color:"#6EE7B7", bg:"rgba(110,231,183,.08)", text:"#10B981" },
+  S: { color:"#137333", bg:"#e6f4ea", text:"#137333" },
+  A: { color:"#188038", bg:"#e6f4ea", text:"#188038" },
+  B: { color:"#1e8e3e", bg:"#e6f4ea", text:"#1e8e3e" },
+  C: { color:"#34a853", bg:"#e6f4ea", text:"#34a853" },
+  D: { color:"#81c784", bg:"#e8f5e9", text:"#137333" },
 };
 
 const WD = ["일","월","화","수","목","금","토"];
@@ -45,20 +45,20 @@ export default function Calendar({ month, events, confirmed, freeWindows, onDate
   }, [base]);
 
   return (
-    <div style={{ display:"flex", flexDirection:"column", height:"100%", background:"var(--bg-2)" }}>
+    <div style={{ display:"flex", flexDirection:"column", height:"100%", background:"#ffffff" }}>
 
       {/* 요일 헤더 */}
       <div style={{
         display:"grid", gridTemplateColumns:"repeat(7,1fr)",
         flexShrink:0,
-        borderBottom:"1.5px solid var(--border)",
-        background:"var(--bg-2)",
+        borderBottom:"1px solid var(--border)",
+        background:"#ffffff",
       }}>
         {WD.map((w,i) => (
           <div key={w} style={{
-            textAlign:"center", padding:"16px 0",
-            fontSize:11, fontWeight:700, letterSpacing:".08em",
-            color: i===0 ? "#EF4444" : i===6 ? "#3B82F6" : "var(--text-3)",
+            textAlign:"center", padding:"10px 0",
+            fontSize:11, fontWeight:600,
+            color: i===0 ? "#d93025" : i===6 ? "#1a73e8" : "var(--text-2)",
           }}>{w}</div>
         ))}
       </div>
@@ -87,12 +87,8 @@ export default function Calendar({ month, events, confirmed, freeWindows, onDate
           const isToday = date === today;
           const g       = grade ? GRADE[grade] : null;
 
-          const cellBg = conf        ? "rgba(37,99,235,.05)"
-                       : busy.length ? "rgba(245,158,11,.06)"
-                       : g           ? g.bg
-                       : "var(--bg-2)";
-
           const isSelected = date === selectedDate;
+          const cellBg = "#ffffff";
 
           return (
             <div key={date}
@@ -101,67 +97,98 @@ export default function Calendar({ month, events, confirmed, freeWindows, onDate
                 borderRight:"1px solid var(--border)",
                 borderBottom:"1px solid var(--border)",
                 background: cellBg,
-                padding:"9px 10px", overflow:"hidden",
+                padding:"6px 8px", overflow:"hidden",
                 transition:"background .15s",
                 position:"relative",
                 cursor: onDateClick ? "pointer" : "default",
+                display:"flex",
+                flexDirection:"column",
+                gap:2,
               }}
               onMouseEnter={e => e.currentTarget.style.background = "var(--bg-3)"}
               onMouseLeave={e => e.currentTarget.style.background = isSelected ? "var(--bg-3)" : cellBg}
             >
-              {/* 선택 링 */}
+              {/* 선택 아웃라인 */}
               {isSelected && (
                 <div style={{
                   position:"absolute", inset:0,
                   border:"2px solid var(--accent)",
-                  borderRadius:3, pointerEvents:"none",
+                  pointerEvents:"none",
                   zIndex:1,
                 }} />
               )}
 
-              {/* 등급 바 */}
-              {g && !busy.length && !conf && (
-                <div style={{
-                  position:"absolute", left:0, top:0, bottom:0, width:3,
-                  background:g.color, borderRadius:"0 2px 2px 0",
-                }} />
-              )}
-
               {/* 날짜 숫자 */}
-              <div style={{ display:"flex", alignItems:"center", gap:4, marginBottom:4 }}>
+              <div style={{ display:"flex", alignItems:"center", justifyContent:"center", marginBottom:2 }}>
                 <span style={{
                   display:"inline-flex", alignItems:"center", justifyContent:"center",
                   width:24, height:24, borderRadius:"50%", flexShrink:0,
-                  fontSize:12, fontWeight: isToday ? 800 : 400,
+                  fontSize:12, fontWeight: isToday ? 700 : 500,
                   background: isToday ? "var(--accent)" : "transparent",
-                  color: isToday ? "#fff"
-                       : dow===0   ? "#EF4444"
-                       : dow===6   ? "#3B82F6"
+                  color: isToday ? "#ffffff"
+                       : dow===0   ? "#d93025"
+                       : dow===6   ? "#1a73e8"
                        : "var(--text-1)",
                 }}>{dn}</span>
-                {g && !busy.length && !conf && (
-                  <span style={{ fontSize:10, fontWeight:700, color:g.text }}>{grade}</span>
-                )}
               </div>
 
-              {/* 일정 */}
-              {busy.slice(0,2).map((l,idx) => (
+              {/* 일정 (Busy) */}
+              {busy.slice(0, 2).map((l, idx) => (
                 <div key={idx} style={{
-                  fontSize:10, lineHeight:1.4, marginBottom:2,
-                  color:"#D97706",
-                  overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap",
-                }}>· {l}</div>
+                  fontSize:11,
+                  padding:"2px 6px",
+                  borderRadius:4,
+                  background:"#fef7e0",
+                  color:"#b06000",
+                  borderLeft:"3px solid #f9ab00",
+                  fontWeight:500,
+                  overflow:"hidden",
+                  textOverflow:"ellipsis",
+                  whiteSpace:"nowrap",
+                }} title={l}>
+                  {l}
+                </div>
               ))}
               {busy.length > 2 && (
-                <div style={{ fontSize:9, color:"var(--text-3)" }}>+{busy.length-2}</div>
+                <div style={{ fontSize:10, color:"var(--text-3)", padding:"0 6px", fontWeight:500 }}>
+                  외 {busy.length - 2}개 더
+                </div>
               )}
 
-              {/* 확정 */}
+              {/* 확정 (Confirmed) */}
               {conf && (
                 <div style={{
-                  fontSize:10, lineHeight:1.4, color:"#2563EB",
-                  overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap",
-                }}>✓ {conf}</div>
+                  fontSize:11,
+                  padding:"2px 6px",
+                  borderRadius:4,
+                  background:"#e8f0fe",
+                  color:"#1a73e8",
+                  borderLeft:"3px solid #1a73e8",
+                  fontWeight:500,
+                  overflow:"hidden",
+                  textOverflow:"ellipsis",
+                  whiteSpace:"nowrap",
+                }} title={conf}>
+                  ✓ {conf}
+                </div>
+              )}
+
+              {/* 빈 날 (Free Windows) */}
+              {g && !busy.length && !conf && (
+                <div style={{
+                  fontSize:11,
+                  padding:"2px 6px",
+                  borderRadius:4,
+                  background:"#e6f4ea",
+                  color:"#137333",
+                  borderLeft:"3px solid #188038",
+                  fontWeight:500,
+                  overflow:"hidden",
+                  textOverflow:"ellipsis",
+                  whiteSpace:"nowrap",
+                }}>
+                  ✨ {grade}등급 자유
+                </div>
               )}
             </div>
           );
@@ -171,22 +198,22 @@ export default function Calendar({ month, events, confirmed, freeWindows, onDate
       {/* 범례 */}
       <div style={{
         display:"flex", gap:14, padding:"10px 16px",
-        borderTop:"1.5px solid var(--border)",
+        borderTop:"1px solid var(--border)",
         flexShrink:0, flexWrap:"wrap",
-        background:"var(--bg-2)",
+        background:"#ffffff",
       }}>
         {Object.entries(GRADE).map(([g, {color}]) => (
-          <span key={g} style={{ display:"flex", alignItems:"center", gap:5, fontSize:11, color:"var(--text-3)" }}>
+          <span key={g} style={{ display:"flex", alignItems:"center", gap:5, fontSize:11, color:"var(--text-2)", fontWeight:500 }}>
             <span style={{ width:10, height:3, background:color, display:"inline-block", borderRadius:99 }}/>
-            {g}등급
+            {g}등급 자유
           </span>
         ))}
-        <span style={{ display:"flex", alignItems:"center", gap:5, fontSize:11, color:"var(--text-3)" }}>
-          <span style={{ width:10, height:3, background:"#D97706", display:"inline-block", borderRadius:99 }}/>
+        <span style={{ display:"flex", alignItems:"center", gap:5, fontSize:11, color:"var(--text-2)", fontWeight:500 }}>
+          <span style={{ width:10, height:3, background:"#f9ab00", display:"inline-block", borderRadius:99 }}/>
           일정
         </span>
-        <span style={{ display:"flex", alignItems:"center", gap:5, fontSize:11, color:"var(--text-3)" }}>
-          <span style={{ width:10, height:3, background:"#2563EB", display:"inline-block", borderRadius:99 }}/>
+        <span style={{ display:"flex", alignItems:"center", gap:5, fontSize:11, color:"var(--text-2)", fontWeight:500 }}>
+          <span style={{ width:10, height:3, background:"#1a73e8", display:"inline-block", borderRadius:99 }}/>
           확정
         </span>
       </div>
