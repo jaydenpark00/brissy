@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from datetime import date
+from typing import Optional
 from backend.supabase_client import supabase
 
 router = APIRouter()
@@ -10,6 +11,11 @@ class EventCreate(BaseModel):
     user_id: str = "default-user"
     date: date
     label: str
+
+
+class EventUpdate(BaseModel):
+    date: Optional[date] = None
+    label: Optional[str] = None
 
 
 @router.post("/events", status_code=200)
@@ -50,3 +56,20 @@ def delete_event(event_id: str):
     res = supabase.table("events").delete().eq("id", event_id).execute()
     if res.data is None:
         raise HTTPException(status_code=404, detail="Event not found")
+
+
+@router.put("/events/{event_id}", status_code=200)
+def update_event(event_id: str, event_data: EventUpdate):
+    update_data = {}
+    if event_data.date is not None:
+        update_data["date"] = str(event_data.date)
+    if event_data.label is not None:
+        update_data["label"] = event_data.label
+
+    if not update_data:
+        raise HTTPException(status_code=400, detail="수정할 데이터를 입력해주세요.")
+
+    res = supabase.table("events").update(update_data).eq("id", event_id).execute()
+    if not res.data:
+        raise HTTPException(status_code=404, detail="해당 일정을 찾을 수 없거나 수정에 실패했습니다.")
+    return res.data[0]
