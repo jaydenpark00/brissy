@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from datetime import date
+from datetime import date as DateType
 from typing import Optional
 from backend.supabase_client import supabase
 
@@ -9,12 +9,12 @@ router = APIRouter()
 
 class EventCreate(BaseModel):
     user_id: str = "default-user"
-    date: date
+    date: DateType
     label: str
 
 
 class EventUpdate(BaseModel):
-    date: Optional[date] = None
+    date: Optional[DateType] = None
     label: Optional[str] = None
 
 
